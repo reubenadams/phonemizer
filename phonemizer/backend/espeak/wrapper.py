@@ -24,9 +24,11 @@ import tempfile
 import weakref
 from typing import Tuple, Dict
 
+from phonemizer.backend import BACKENDS
 from phonemizer.backend.espeak.api import EspeakAPI
 from phonemizer.backend.espeak.voice import EspeakVoice
 
+available_backends = BACKENDS.keys()
 
 class EspeakWrapper:
     """Wrapper on espeak shared library
@@ -205,7 +207,7 @@ class EspeakWrapper:
         # voices is an array to pointers, terminated by None
         while voices[index]:
             voice = voices[index].contents
-            if not ((os.name == 'nt') and voice.identifier.startswith(b'mb')):
+            if not (voice.identifier.startswith(b'mb') and ('espeak-mbrola' not in available_backends)):
                 available_voices.append(EspeakVoice(
                     name=os.fsdecode(voice.name).replace('_', ' '),
                     language=os.fsdecode(voice.languages)[1:],
